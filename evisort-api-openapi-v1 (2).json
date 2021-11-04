@@ -1,0 +1,3019 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Evisort API",
+    "description": "OpenAPI specification for Evisort API for integration with 3rd party services",
+    "termsOfService": "https://evisort.com/api/terms",
+    "contact": {
+      "email": "support@evisort.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.evisort.com/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "authentication",
+      "description": "Generate Access Token (JWT)"
+    },
+    {
+      "name": "upload-documents",
+      "description": "Upload a new document"
+    },
+    {
+      "name": "list-documents",
+      "description": "List document records"
+    },
+    {
+      "name": "download-document",
+      "description": "Download document"
+    },
+    {
+      "name": "update-document",
+      "description": "Update fields in a document"
+    },
+    {
+      "name": "metadata",
+      "description": "List/Update fields and provisions"
+    },
+    {
+      "name": "users",
+      "description": "Bulk Export/Import users"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/token": {
+      "post": {
+        "summary": "Generate a new token",
+        "tags": [
+          "authentication"
+        ],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/export": {
+      "get": {
+        "summary": "Export users spreadsheet for current client",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "only_headers",
+            "in": "query",
+            "description": "Boolean flag that determines whether to export the complete spreadsheet or only the headers. If not defined, it defaults to false.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": true
+            },
+            "example": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersExportResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import": {
+      "post": {
+        "summary": "Import users spreadsheet",
+        "tags": [
+          "users"
+        ],
+        "requestBody": {
+          "content": {
+            "json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/UsersImportResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Import users jobs",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/pageSizeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersImportListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/{importId}": {
+      "get": {
+        "summary": "Import Process status",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "95389c6e-bd09-4ff5-93bf-25d250ee2b5a"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersImportStatusResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/summary": {
+      "post": {
+        "summary": "Generate a summary of a users import operation",
+        "tags": [
+          "users"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersImportSummaryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/UsersImportSummaryResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/{importId}/acknowledge": {
+      "post": {
+        "summary": "Request the acknowledge of a user import process",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "95389c6e-bd09-4ff5-93bf-25d250ee2b5a"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersImportAcknowledgeResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/{importId}/cancel": {
+      "post": {
+        "summary": "Request the cancellation of a user import process",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "95389c6e-bd09-4ff5-93bf-25d250ee2b5a"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/UsersImportCancelResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/{importId}/process-errors": {
+      "get": {
+        "summary": "Import Process Errors Results spreadsheets",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "95389c6e-bd09-4ff5-93bf-25d250ee2b5a"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersExportResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/users/import/{importId}/summary-errors": {
+      "get": {
+        "summary": "Import Summary Errors Results spreadsheets",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "importId",
+            "in": "path",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "95389c6e-bd09-4ff5-93bf-25d250ee2b5a"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UsersExportResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/fields": {
+      "get": {
+        "summary": "List all the fields",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "active",
+            "schema": {
+              "type": "boolean"
+            },
+            "required": false,
+            "description": "Specify whether you want active or inactive fields. Leave out to specify both."
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FieldListResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/documents": {
+      "post": {
+        "summary": "Upload a new document",
+        "tags": [
+          "upload-documents"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/UploadRequestAccepted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List multiple document records",
+        "tags": [
+          "list-documents"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pageParam"
+          },
+          {
+            "$ref": "#/components/parameters/pageSizeParam"
+          },
+          {
+            "in": "query",
+            "name": "modifiedSince",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "description": "Filter by last modified date. Format:https://tools.ietf.org/html/rfc3339#section-5.6"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DocumentsResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/documents/{evisortId}": {
+      "get": {
+        "summary": "List a document record",
+        "tags": [
+          "list-documents"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evisortId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minimum": 1
+            },
+            "description": "The Evisort document ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DocumentResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update or create fields in a document. (Field's name is case sensative)",
+        "tags": [
+          "update-document"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evisortId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The Evisort document ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContentResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "delete-document"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evisortId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minimum": 1
+            },
+            "description": "The Evisort document ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContentResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/documents/{evisortId}/content": {
+      "get": {
+        "summary": "Download a document",
+        "tags": [
+          "download-document"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evisortId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minimum": 1
+            },
+            "description": "The Evisort document ID"
+          },
+          {
+            "in": "query",
+            "name": "ocr",
+            "required": false,
+            "allowEmptyValue": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Flag to specify if OCR'd version is requested"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "allowEmptyValue": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "docx",
+                "pdf"
+              ]
+            },
+            "description": "Content type of the document to download, applicable only when ocr is designated 'true' in query. If missing, the format of the original document (pdf or docx) is returned.\n"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Response redirecting to a pre-authenticated download URL for the document. To download the document, your app must follow the Location header in the response. Pre-authenticated URLs are only valid for a short period of time (a few minutes) and do not require an Authorization header to access.\n",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "Pre-authenticated download URL with expiration"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/documents/docid/{docId}": {
+      "get": {
+        "summary": "List a document record by docId",
+        "tags": [
+          "list-documents"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "docId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minimum": 1
+            },
+            "description": "The user provided external document ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DocumentResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/provisions": {
+      "post": {
+        "summary": "Create a new provision",
+        "tags": [
+          "metadata"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProvisionSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recordId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "record id of bulk tag"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List all provisions",
+        "tags": [
+          "metadata"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProvisionsListResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/provision-records/{recordId}": {
+      "get": {
+        "summary": "Get status of a provision record",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "recordId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minimum": 1,
+              "format": "uuid"
+            },
+            "description": "The ID of the training record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProvisionsStatusResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/search": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/pageParam"
+        },
+        {
+          "$ref": "#/components/parameters/pageSizeParam"
+        }
+      ],
+      "get": {
+        "summary": "Simple search for documents",
+        "description": "Used for searching for documents based on a single query.",
+        "tags": [
+          "search"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "description": "Determines the type of search to perform",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "simpletext",
+                "boolean",
+                "field",
+                "folder",
+                "provision"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "terms",
+            "description": "The term or terms on which you're searching. If the type is \"simpletext\", this may be repeated.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "additional",
+            "description": "Needed by some queries for type \"field\" searches that require multiple arguments.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "description": "Required for type \"simpletext\" searches. Specifies where to look for the given text.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "filename",
+                "content",
+                "both"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "folders",
+            "description": "Required for type \"folder\" searches instead of argument \"terms\". Is an array of full folder paths. Each folder is expected to start with \"Documents/\".",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "containsany",
+                "containsall",
+                "containsexact",
+                "notcontainsany",
+                "notcontainsall",
+                "notcontainsexact",
+                "isblank",
+                "notisblank",
+                "equals",
+                "notequals",
+                "containstext",
+                "notcontainstext",
+                "eq",
+                "lt",
+                "lte",
+                "gt",
+                "gte",
+                "between",
+                "before",
+                "after",
+                "on",
+                "next",
+                "last"
+              ]
+            },
+            "description": "Specifies the exact filtering behavior. The valid options vary depending on the type of search and, for \"field\" searches, the underlying type of the field.:\n  * _All Fields_\n    * `isblank` - Field is empty\n    * `notisblank` - Field is not empty\n  * _Datetime Fields_\n    * `before` - Field is before the given date\n    * `after` - Field is after the given date\n    * `on` - Field is on the given date\n    * `between` - Field is between two given dates\n    * `next` - Field is in the next X amount of time\n    * `last` - Field is in the last X amount of time\n  * _Number Fields_\n    * `eq` - Field is equal to the given value\n    * `lt` - Field is less than the given value\n    * `lte` - Field is less than or equal to the given value\n    * `gt` - Field is greater than the given value\n    * `gte` - Field is greater than or equal to the given value\n    * `between` - Field is between the two given values\n  * _String Fields_\n    * `containstext` - Field contains the given text\n    * `notcontainstext` - Field does not contain the given text\n  * _Single-select Fields_\n    * `equals` - Field equals the given string\n    * `notequals` - Field does not equal the given string\n  * _Multi-select Fields_\n    * `containsany` - Field contains any of the given terms\n    * `containsall` - Field contains all of the given terms\n    * `notcontainsany` - Field does not contain any of the given terms\n  * _Boolean Fields_\n    * `equals` - Field equals the given term. Must be either \"true\" or \"false\"\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FoundDocumentsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Composite search for documents",
+        "description": "Used for searching for documents based on a queries that are nested and/or combined with \"and\" or \"or\".",
+        "tags": [
+          "search"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompositeSearch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FoundDocumentsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/contracts/drafts": {
+      "post": {
+        "tags": [
+          "drafts"
+        ],
+        "summary": "Create a contract draft from a template",
+        "operationId": "createDraft",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "values": {
+                    "type": "string"
+                  },
+                  "template": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "link": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "expirationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts/workflows/{workflowId}/intake-form/": {
+      "get": {
+        "tags": [
+          "intake forms"
+        ],
+        "summary": "Get an intake form for a workflow",
+        "operationId": "getIntakeForm",
+        "parameters": [
+          {
+            "name": "workflowId",
+            "in": "path",
+            "description": "Get an intake form for given workflow",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Authentication response containing JWT access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeFormRes"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "failed to find workflow/intake-form"
+          }
+        }
+      }
+    },
+    "/contracts/workflows/available/": {
+      "get": {
+        "tags": [
+          "workflows"
+        ],
+        "summary": "Get all published workflows",
+        "description": "Get all published workflows",
+        "operationId": "getAllPublishedWorkflows",
+        "parameters": [
+          {
+            "name": "completed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Workflow"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "failed to get published workflows"
+          }
+        }
+      }
+    },
+    "/contracts/persist/": {
+      "post": {
+        "tags": [
+          "persist"
+        ],
+        "summary": "Persist specific information needed for later interactions with the platform",
+        "operationId": "persist",
+        "requestBody": {
+          "description": "For Intake Form Integration, additional information [here](https://support.evisort.com/hc/en-us/articles/4406460806039-Using-Public-API-s-to-Integrate-with-Evisort-s-Contract-Workflow)",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object"
+                  },
+                  "meta": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "data",
+                  "meta"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "name": "EVISORT-API-KEY",
+        "in": "header"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "pageParam": {
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Specify the page number of paginated results to return"
+        }
+      },
+      "pageSizeParam": {
+        "in": "query",
+        "name": "pageSize",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "default": 100
+        },
+        "description": "Specify the number of results per page."
+      }
+    },
+    "schemas": {
+      "BaseSearch": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "simpletext",
+              "boolean",
+              "folder",
+              "provision",
+              "field",
+              "operator",
+              "section"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "CompositeSearch": {
+        "description": "Structure for organizing multiple search filters",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "array",
+            "description": "List of search filters. Every search filter must be separated by an OperatorSearch object. SectionSearch objects allow for nesting of filters.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SimpleTextSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/BooleanSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/ProvisionSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/DateFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/NumberFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/TextFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/SingleSelectFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/MultiSelectFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/AttachmentFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/BooleanFieldSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/SectionSearch"
+                },
+                {
+                  "$ref": "#/components/schemas/OperatorSearch"
+                }
+              ]
+            }
+          }
+        },
+        "example": {
+          "query": [
+            {
+              "type": "field",
+              "name": "Counterparties",
+              "filter": "containsAny",
+              "terms": [
+                "Evisort, Inc.",
+                "Acme"
+              ]
+            },
+            {
+              "type": "operator",
+              "value": "and"
+            },
+            {
+              "type": "section",
+              "query": [
+                {
+                  "type": "folder",
+                  "folders": [
+                    "Documents/Vendor",
+                    "Documents/Agreements/Evisort"
+                  ]
+                },
+                {
+                  "type": "operator",
+                  "value": "or"
+                },
+                {
+                  "type": "boolean",
+                  "query": "Mutual /7 agreement"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "OperatorSearch": {
+        "description": "Used to combine other search filters. Cannot be used on its own.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "enum": [
+                  "and",
+                  "or"
+                ]
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "SectionSearch": {
+        "description": "Structure for organizing multiple search filters.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "description": "Structure for organizing multiple search filters",
+            "properties": {
+              "query": {
+                "type": "array",
+                "description": "List of search filters. Every search filter must be separated by an OperatorSearch object. SectionSearch objects allow for nesting of filters.",
+                "items": {
+                  "type": "object",
+                  "description": "Additional filters. Can be arbitrarily nested."
+                }
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        ]
+      },
+      "SimpleTextSearch": {
+        "description": "Simple text searching.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string",
+                "enum": [
+                  "filename",
+                  "content",
+                  "both"
+                ],
+                "description": "Category options: * `filename` - Search for text within the filename * `content` - Search for text within the file contents * `both` - Search for text within either\n"
+              },
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "containsany",
+                  "containsall",
+                  "containsexact",
+                  "notcontainsany",
+                  "notcontainsall",
+                  "notcontainsexact"
+                ],
+                "description": "Filter options: * `containsany` - Looks for text that contains any of the given terms * `containsall` - Looks for text that contains all of the given terms * `containsexact` - Looks for text that contains the exact sequence of terms * `notcontainsany` - Looks for text that does not contain any of the given terms * `notcontainsall` - Looks for text that does not contain all of the given terms * `notcontainsexact` - Looks for text that does not contain the exact sequence of terms\n"
+              },
+              "terms": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "category",
+              "filter",
+              "terms"
+            ]
+          }
+        ]
+      },
+      "BooleanSearch": {
+        "description": "Search for documents that match custom boolean logic.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The query to execute. See `https://support.evisort.com/hc/en-us/articles/360042657494-Chart-Boolean-Text-Search-Definitions-and-Examples` for more information.",
+                "example": "Confidentiality /7 mutual"
+              }
+            },
+            "required": [
+              "query"
+            ]
+          }
+        ]
+      },
+      "ProvisionSearch": {
+        "description": "Search for documents based on provisions.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "provision"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "description": "The provision name"
+              },
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "contains",
+                  "notcontains"
+                ],
+                "description": "Filter options: * `contains` - Matches if document contains the given provision * `notcontains` - Matches if document does not contain the given provision\n"
+              },
+              "search_within": {
+                "type": "string",
+                "enum": [
+                  "containsany",
+                  "containsall",
+                  "containsexact",
+                  "notcontainsany",
+                  "notcontainsall",
+                  "notcontainsexact"
+                ],
+                "description": "Optionally look within a provision for the presence or absence of the provided terms. This is only considered if the \"filter\" is set to \"contains\". Search Within options: * `containsany` - Looks for text within the given provision that contains any of the given terms * `containsall` - Looks for text within the given provision that contains all of the given terms * `containsexact` - Looks for text within the given provision that contains the exact sequence of terms * `notcontainsany` - Looks for text within the given provision that does not contain any of the given terms * `notcontainsall` - Looks for text within the given provision that does not contain all of the given terms * `notcontainsexact` - Looks for text within the given provision that does not contain the exact sequence of terms\n"
+              },
+              "terms": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of terms to for within a provision of with the given \"name\""
+              }
+            },
+            "required": [
+              "name",
+              "filter"
+            ]
+          }
+        ]
+      },
+      "FolderSearch": {
+        "description": "Search for documents within a given set of folders.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Search for documents within a given set of folders."
+              },
+              "folders": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "List of folder paths to search on. Each folder needs to start with “Documents/”. Cannot include the root folder.",
+                "example": [
+                  "Documents/Vendor/",
+                  "Documents/Client/Liability/"
+                ]
+              }
+            },
+            "required": [
+              "folders"
+            ]
+          }
+        ]
+      },
+      "FieldSearch": {
+        "description": "Search for documents based on field information. The arguments needed depend on the underlying type for the field specified.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the field"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      },
+      "DateFieldSearch": {
+        "description": "Field search for datetime fields.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "before",
+                  "after",
+                  "on",
+                  "between",
+                  "next",
+                  "last"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `before` - Field is before the given date\n  * `after` - Field is after the given date\n  * `on` - Field is on the given date\n  * `between` - Field is between two given dates\n  * `next` - Field is in the next X amount of time\n  * `last` - Field is in the last X amount of time\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\". If filter is \"before\", \"after\", \"on\", or \"between\", expects a date-parsable string. If filter is \"next\" or \"last\", expects a number.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "additional": {
+                "description": "Required if filter is \"between\", \"next\", or \"last\". If filter is \"between\", expects a date-parsable string. If filter is \"next\" or \"last\", expects a string of either \"day\", \"week\", \"month\", or \"year\".",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "day",
+                      "week",
+                      "month",
+                      "year"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "NumberFieldSearch": {
+        "description": "Field search for number fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "eq",
+                  "lt",
+                  "lte",
+                  "gt",
+                  "gte",
+                  "between"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `eq` - Field is equal to the given value\n  * `lt` - Field is less than the given value\n  * `lte` - Field is less than or equal to the given value\n  * `gt` - Field is greater than the given value\n  * `gte` - Field is greater than or equal to the given value\n  * `between` - Field is between the two given values\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\".",
+                "type": "number"
+              },
+              "additional": {
+                "description": "Required if filter is \"between\"",
+                "type": "number"
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "TextFieldSearch": {
+        "description": "Field search for string fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "containstext",
+                  "notcontainstext"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `containstext` - Field contains the given text\n  * `notcontainstext` - Field does not contain the given text\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\".",
+                "type": "string"
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "SingleSelectFieldSearch": {
+        "description": "Field search for single-select fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "equals",
+                  "notequals"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `equals` - Field equals the given string\n  * `notequals` - Field does not equal the given string\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\"",
+                "type": "string"
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "MultiSelectFieldSearch": {
+        "description": "Field search for multi-select fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "containsany",
+                  "containsall",
+                  "notcontainsany"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `containsany` - Field contains any of the given terms\n  * `containsall` - Field contains all of the given terms\n  * `notcontainsany` - Field does not contain any of the given terms\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\"",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "AttachmentFieldSearch": {
+        "description": "Field search for attachment fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank"
+                ],
+                "description": "Filter options:\n  * `isblank` - Does not have attachments\n  * `notisblank` - Has attachments\n"
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "BooleanFieldSearch": {
+        "description": "Field search for boolean fields",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FieldSearch"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "isblank",
+                  "notisblank",
+                  "equals"
+                ],
+                "description": "Filter options:\n  * `isblank` - Field is empty\n  * `notisblank` - Field is not empty\n  * `equals` - Field equals the given term. Must be either \"true\" or \"false\"\n"
+              },
+              "terms": {
+                "description": "Required if filter is not \"isblank\" or \"notisblank\"",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false"
+                    ]
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "filter"
+            ]
+          }
+        ]
+      },
+      "UploadRequest": {
+        "type": "object",
+        "properties": {
+          "docId": {
+            "type": "string",
+            "description": "External document ID"
+          },
+          "fields": {
+            "type": "string",
+            "description": "Stringified JSON, array of `Field` schema objects. Note that string values cannot exceed 5000 characters.",
+            "example": "[{\"name\": \"Custom Field\", \"values\": [{\"value\": \"First Metadata\"}]}, {\"name\": \"Counterparties\", \"values\": [{\"value\": \"Vendor Inc.\"}, {\"value\": \"Management Incorporated\"}]}]"
+          },
+          "file": {
+            "type": "string",
+            "description": "File object",
+            "format": "binary"
+          },
+          "uploadPath": {
+            "type": "string",
+            "description": "\"/\" separated path to the folder to contain the uploaded file. Will create the specified folder structure if it does not already exist.",
+            "example": "Finance/Agreements"
+          }
+        },
+        "required": [
+          "docId",
+          "file"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateDocumentRequest": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "description": "Array of `Field` schema objects. Note that string values cannot exceed 5000 characters.",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            },
+            "example": [
+              {
+                "name": "Custom Field",
+                "values": [
+                  {
+                    "value": "First Metadata"
+                  }
+                ]
+              },
+              {
+                "name": "Counterparties",
+                "values": [
+                  {
+                    "value": "Vendor Inc."
+                  },
+                  {
+                    "value": "Management Incorporate"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "fields"
+        ],
+        "additionalProperties": false
+      },
+      "UsersExportFile": {
+        "type": "string",
+        "format": "binary",
+        "xml": {
+          "wrapped": true
+        },
+        "example": "User ID=1234 Email=user@evisort.com FirstName=User LastName=Evisort JobTitle=Dev AccessLevel=Admin Department= LastAccess=21/07/2011 10:30:00 WorkflowAdmin=No"
+      },
+      "UsersImportRequest": {
+        "type": "object",
+        "properties": {
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          },
+          "email_new_users": {
+            "type": "boolean",
+            "description": "Boolean flag that determines whether to send an email to new users or not (non existing users in the DB, but present in the spreadsheet). If not defined, it defaults to false.",
+            "example": false
+          },
+          "update_existing_users": {
+            "type": "boolean",
+            "description": "Boolean flag that determines whether to update existing users or not (already existing users in the DB). If not defined, it defaults to false.",
+            "example": false
+          },
+          "delete_missing_users": {
+            "type": "boolean",
+            "description": "Boolean flag that determines whether to delete missing users or not (users in the DB but not in the spreadsheet). If not defined, it defaults to false.",
+            "example": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "UsersImportResponse": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the current Client.",
+            "example": 1
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the celery task.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          }
+        },
+        "required": [
+          "client_id",
+          "import_id",
+          "task_id"
+        ],
+        "additionalProperties": false
+      },
+      "UsersImportListResponse": {
+        "type": "object",
+        "properties": {
+          "imports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsersImportStatusResponse"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "example": "<BASE_URL>/v1/users/import?page=3&pageSize=10"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "example": "<BASE_URL>/v1/users/import?page=1&pageSize=10"
+          }
+        }
+      },
+      "UsersImportStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Number that determines the id of the import process.",
+            "example": 1
+          },
+          "client_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the current Client.",
+            "example": 1
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the user that created the import process.",
+            "example": 1
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the celery task.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the import process.",
+            "enum": [
+              "new",
+              "running",
+              "cancelled",
+              "finished",
+              "failed"
+            ],
+            "example": "new"
+          },
+          "cancel_requested": {
+            "type": "boolean",
+            "description": "Indicates whether the import process has been requested to be cancelled."
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "description": "Indicates whether the import process has been requested to be acknowledged."
+          },
+          "timestamps": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Start timestamp of the import process."
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time",
+                "description": "End timestamp of the import process."
+              }
+            }
+          },
+          "counters": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total count of user records to be processed.",
+                "example": 1
+              },
+              "processed": {
+                "type": "integer",
+                "description": "Actual count of processed records.",
+                "example": 1
+              },
+              "users_created": {
+                "type": "integer",
+                "description": "Actual count of created users.",
+                "example": 1
+              },
+              "users_updated": {
+                "type": "integer",
+                "description": "Actual count of updated users.",
+                "example": 1
+              },
+              "users_deleted": {
+                "type": "integer",
+                "description": "Actual count of deleted users.",
+                "example": 1
+              },
+              "errors": {
+                "type": "integer",
+                "description": "Actual count of user records with errors.",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "UsersImportSummaryRequest": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Excel file with users list",
+            "format": "binary"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UsersImportSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the current Client.",
+            "example": 1
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total count of user records to be processed.",
+                "example": 1
+              },
+              "new_users": {
+                "type": "integer",
+                "description": "Count of new users to be created.",
+                "example": 1
+              },
+              "existing": {
+                "type": "integer",
+                "description": "Count of existing users to be updated.",
+                "example": 1
+              },
+              "to_be_deleted": {
+                "type": "integer",
+                "description": "Count of users to be deleted.",
+                "example": 1
+              },
+              "errors": {
+                "type": "integer",
+                "description": "Count of user records with errors.",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "UsersImportAcknowledgeResponse": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the current Client.",
+            "example": 1
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          }
+        },
+        "required": [
+          "client_id",
+          "import_id"
+        ],
+        "additionalProperties": false
+      },
+      "UsersImportCancelResponse": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "description": "Number that determines the id of the current Client.",
+            "example": 1
+          },
+          "import_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "String GUID that determines the id of the current Import summary and process. This identifier identifies each file.",
+            "example": "14c89641-d187-4934-a5b6-2d9b2da0efc4"
+          }
+        },
+        "required": [
+          "client_id",
+          "import_id"
+        ],
+        "additionalProperties": false
+      },
+      "FieldList": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "fields": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "The display value for the field"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The internal name for the field"
+                },
+                "type": {
+                  "$ref": "#/components/schemas/TypeEnum"
+                },
+                "helpText": {
+                  "nullable": true,
+                  "type": "string",
+                  "description": "Optional display string for extra instructions relating to this field"
+                },
+                "active": {
+                  "type": "boolean",
+                  "description": "Indicates whether this field is currently visible"
+                },
+                "allowedValues": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "The available selectable values for the field. Used with \"single_select\" and sometimes \"multi_select\". An empty array means any value is accepted."
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "count",
+          "fields"
+        ],
+        "additionalProperties": false
+      },
+      "UploadRequestAccepted": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "evisortId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "evisortId"
+        ],
+        "additionalProperties": false
+      },
+      "Documents": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "example": "<BASE_URL>/v1/documents/?modifiedSince=2020-01-01T12:00:00.50Z&page=3&pageSize=10"
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "example": "<BASE_URL>/v1/documents/?modifiedSince=2020-01-01T12:00:00.50Z&page=1&pageSize=10"
+          }
+        },
+        "required": [
+          "documents"
+        ],
+        "additionalProperties": true
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "docId": {
+            "type": "string",
+            "description": "Could be null for documents not uploaded via the API",
+            "nullable": true
+          },
+          "evisortId": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "dateModified": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          },
+          "provisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Provision"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "The filename of the document"
+          },
+          "path": {
+            "type": "string",
+            "description": "The path of the document"
+          }
+        },
+        "required": [
+          "docId",
+          "dateModified",
+          "fields",
+          "provisions",
+          "evisortId",
+          "status",
+          "name",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "FoundDocuments": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FoundDocument"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "description": "The total number of unique documents found in the search. If this is larger than the page size, additional results can be found on other pages."
+          },
+          "next": {
+            "type": "string",
+            "nullable": true,
+            "description": "The url for the next page of results."
+          },
+          "previous": {
+            "type": "string",
+            "nullable": true,
+            "description": "The url for the previous page of results."
+          }
+        }
+      },
+      "FoundDocument": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "dateModified": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          },
+          "provisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Provision"
+            }
+          },
+          "fileDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileDetails"
+            },
+            "description": "An array of all identical documents in the system that match the query. These documents share the same field, provision, and status metadata."
+          }
+        },
+        "required": [
+          "fileDetails",
+          "fields",
+          "provisions",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "FileDetails": {
+        "type": "object",
+        "properties": {
+          "docId": {
+            "type": "string",
+            "description": "Could be null for documents not uploaded via the API",
+            "nullable": true
+          },
+          "evisortId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "The filename of the document"
+          },
+          "path": {
+            "type": "string",
+            "description": "The path of the document"
+          }
+        },
+        "required": [
+          "docId",
+          "evisortId",
+          "name",
+          "path"
+        ]
+      },
+      "ProvisionsList": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "provisions": {
+            "description": "A list of provision types with any associated training text used to generate them",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "provisionTags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProvisionsStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "DONE",
+              "DONE_WITH_FAILURES",
+              "IN_PROGRESS"
+            ]
+          },
+          "details": {
+            "description": "The aggregated status of the training request",
+            "type": "object",
+            "properties": {
+              "FAILED": {
+                "type": "integer"
+              },
+              "SUCCESS": {
+                "type": "integer"
+              },
+              "QUEUED": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "IN_PROGRESS",
+          "READY"
+        ]
+      },
+      "Field": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldValue"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "values"
+        ],
+        "additionalProperties": false
+      },
+      "FieldValue": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      "ProvisionSchema": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 10
+          },
+          "name": {
+            "type": "string"
+          },
+          "bulkTag": {
+            "type": "boolean",
+            "default": true
+          },
+          "evisortId": {
+            "type": "integer",
+            "description": "document id"
+          }
+        },
+        "required": [
+          "content",
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "Provision": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProvisionContent"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "ProvisionContent": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "AuthValid": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT Access Token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+          }
+        }
+      },
+      "TypeEnum": {
+        "type": "string",
+        "enum": [
+          "string",
+          "number",
+          "boolean",
+          "datetime",
+          "multi_select",
+          "single_select"
+        ],
+        "description": "Type values:\n  * `string` - String value, 5000 character limit\n  * `number` - Number value, stored as a Float\n  * `boolean` - Boolean value\n  * `datetime` - Datetime value\n  * `multi_select` - An array of String values\n  * `single_select` - A single string from a list of options\n"
+      },
+      "IntakeFormRes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "workflowId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntakeFormSection"
+            }
+          }
+        }
+      },
+      "IntakeFormSection": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntakeFormQuestion"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "position"
+        ]
+      },
+      "IntakeFormQuestion": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "isRequired": {
+            "type": "boolean"
+          },
+          "field": {
+            "$ref": "#/components/schemas/IntakeFormField"
+          }
+        },
+        "required": [
+          "title",
+          "position",
+          "isRequired",
+          "field"
+        ]
+      },
+      "IntakeFormField": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "Workflow": {
+        "type": "object",
+        "properties": {
+          "conditions": {
+            "type": "object"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fieldLinks": {
+            "type": "object"
+          },
+          "fieldMappings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "implicitFields": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "isDraft": {
+            "type": "boolean"
+          },
+          "fields": {
+            "type": "object"
+          },
+          "settings": {
+            "type": "object"
+          },
+          "signers": {
+            "type": "object"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdBy": {
+            "type": "integer"
+          },
+          "createdDate": {
+            "type": "string"
+          },
+          "hasCompanyPaper": {
+            "type": "boolean"
+          },
+          "hasCounterpartyPaper": {
+            "type": "boolean"
+          },
+          "modifiedDate": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "stages": {
+            "type": "object",
+            "properties": {
+              "finalize": {
+                "$ref": "#/components/schemas/Stage"
+              },
+              "review": {
+                "$ref": "#/components/schemas/Stage"
+              },
+              "sign": {
+                "$ref": "#/components/schemas/Stage"
+              }
+            }
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkflowVersion"
+            }
+          }
+        }
+      },
+      "Stage": {
+        "type": "object",
+        "properties": {
+          "coordinator": {
+            "type": "integer"
+          },
+          "phases": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "WorkflowVersion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activeTickets": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "integer"
+          },
+          "totalTickets": {
+            "type": "integer"
+          },
+          "published": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "responses": {
+      "AuthResponse": {
+        "description": "Successful Authentication response containing JWT access token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AuthValid"
+            }
+          }
+        }
+      },
+      "FieldListResponse": {
+        "description": "FieldList object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FieldList"
+            }
+          }
+        }
+      },
+      "DocumentResponse": {
+        "description": "Document object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Document"
+            }
+          }
+        }
+      },
+      "DocumentsResponse": {
+        "description": "Document object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Documents"
+            }
+          }
+        }
+      },
+      "FoundDocumentsResponse": {
+        "description": "FoundDocument object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FoundDocuments"
+            }
+          }
+        }
+      },
+      "ProvisionsListResponse": {
+        "description": "Document object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProvisionsList"
+            }
+          }
+        }
+      },
+      "ProvisionsStatusResponse": {
+        "description": "Provision Status object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProvisionsStatus"
+            }
+          }
+        }
+      },
+      "UploadRequestAccepted": {
+        "description": "Request has been accepted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UploadRequestAccepted"
+            }
+          }
+        }
+      },
+      "NoContentResponse": {
+        "description": "No Content"
+      },
+      "UnauthorizedError": {
+        "description": "Access token is missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "description": "Invalid request parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Requested resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Internal/Unexpected Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UsersExportResponse": {
+        "description": "Users Export file",
+        "content": {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersExportFile"
+            }
+          }
+        }
+      },
+      "UsersImportResponse": {
+        "description": "Request has been accepted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportResponse"
+            }
+          }
+        }
+      },
+      "UsersImportListResponse": {
+        "description": "List of a user import processes",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportListResponse"
+            }
+          }
+        }
+      },
+      "UsersImportStatusResponse": {
+        "description": "Status of a user import process",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportStatusResponse"
+            }
+          }
+        }
+      },
+      "UsersImportSummaryResponse": {
+        "description": "Summary of a user import process",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportSummaryResponse"
+            }
+          }
+        }
+      },
+      "UsersImportAcknowledgeResponse": {
+        "description": "Request has been accepted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportAcknowledgeResponse"
+            }
+          }
+        }
+      },
+      "UsersImportCancelResponse": {
+        "description": "Request has been accepted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UsersImportCancelResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}
